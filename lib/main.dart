@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:split_receipt/page_navigator.dart';
 
 void main() {
   runApp(
     const MaterialApp(
-      home: Scaffold(
-        bottomNavigationBar: Navigator(),
-      ),
+      home: PageNavigator(),
     ),
   );
 }
