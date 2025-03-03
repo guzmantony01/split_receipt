@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 class NameHandler extends StatefulWidget {
-  final void Function(String) myCallback;
-  const NameHandler({required this.myCallback, super.key});
+  final void Function(int, String) myCallback;
+  const NameHandler({required this.nameID, required this.myCallback, super.key});
+
+  final nameID;
 
   @override
   State<NameHandler> createState() {
@@ -11,6 +13,7 @@ class NameHandler extends StatefulWidget {
 }
 
 class _NameHandlerState extends State<NameHandler> {
+  
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -19,7 +22,7 @@ class _NameHandlerState extends State<NameHandler> {
         height: 50,
         color: Colors.deepPurple[200],
         child: TextField(
-          onChanged: (String text) => widget.myCallback(text),
+          onChanged: (String text) => widget.myCallback(widget.nameID, text),
         ),
       ),
     );

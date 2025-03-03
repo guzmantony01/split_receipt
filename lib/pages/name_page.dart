@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:split_receipt/misc/name_handler.dart';
 
 class NamePage extends StatefulWidget {
-  const NamePage({super.key});
+  final void Function(int, String) myCallback;
+  const NamePage({required this.myCallback, super.key});
 
   @override
   State<NamePage> createState() {
@@ -12,8 +13,9 @@ class NamePage extends StatefulWidget {
 
 class _NamePageState extends State<NamePage> {
 
-  void updatedName (String name) {
-    print(name);
+  void updatedText (int nameID, String name) {
+    print('This is _NamePageState'+'$nameID: $name');
+    () => widget.myCallback(nameID, name);
   }
 
   @override
@@ -21,8 +23,8 @@ class _NamePageState extends State<NamePage> {
     return Scaffold(
       body: ListView(
         children: [
-          NameHandler(myCallback: updatedName),
-          NameHandler(myCallback: updatedName),
+          NameHandler(nameID: 1, myCallback: updatedText),
+          NameHandler(nameID: 2, myCallback: updatedText),
         ],
       ),
     );

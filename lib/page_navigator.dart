@@ -4,7 +4,7 @@ import 'package:split_receipt/pages/bill_page.dart';
 import 'package:split_receipt/pages/breakdown_page.dart';
 import 'package:split_receipt/pages/name_page.dart';
 
-import 'package:split_receipt/classes/profile.dart';
+import 'package:split_receipt/classes/classes.dart';
 
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
@@ -16,14 +16,16 @@ class PageNavigator extends StatefulWidget {
 }
 
 class _PageNavigatorState extends State<PageNavigator> {
-int pageID = 0;
+  int pageID = 0;
 
-  List<String> names = [];
+  void updatedName (int nameID, String name) {
+    print('This is _PageNavigatorState'+'$nameID: $name');
+  }
 
   final List<Widget> pages = [
     const BillPage(),
     const BreakDownPage(),
-    const NamePage(),
+    NamePage(myCallback: updatedName),
   ];
 
   @override

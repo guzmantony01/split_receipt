@@ -11,3 +11,17 @@ Breakdown Page:
 
 Names Page:
     - Page dedicated for you to add the names of your party.
+
+
+Class Structures
+Profile {
+    nameID
+    name
+    itemID
+}
+
+BillableItems {
+    itemID
+    itemName
+    itemCost
+}
