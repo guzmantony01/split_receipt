@@ -4,6 +4,8 @@ import 'package:split_receipt/pages/bill_page.dart';
 import 'package:split_receipt/pages/breakdown_page.dart';
 import 'package:split_receipt/pages/name_page.dart';
 
+import 'package:split_receipt/classes/profile.dart';
+
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
 
@@ -16,7 +18,7 @@ class PageNavigator extends StatefulWidget {
 class _PageNavigatorState extends State<PageNavigator> {
 int pageID = 0;
 
-  List<String> namesList = [];
+  List<String> names = [];
 
   final List<Widget> pages = [
     const BillPage(),
