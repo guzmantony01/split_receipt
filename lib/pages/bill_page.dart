@@ -5,6 +5,6 @@ class BillPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(child: Text('bill_page'));
+    return const Center(child: Text('Billing_Page', style: TextStyle(fontSize: 30),));
   }
 }

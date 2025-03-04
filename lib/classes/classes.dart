@@ -2,15 +2,14 @@
 class Profile {
   int nameID;
   String name;
-  int itemID;
 
-  Profile({required this.nameID, required this.name, required this.itemID});
+  Profile({required this.nameID, required this.name});
 }
 
-class BillableItems {
+class Items {
   int itemID;
   String itemName;
   double itemCost;
 
-  BillableItems({required this.itemID, required this.itemName, required this.itemCost});
+  Items({required this.itemID, required this.itemName, required this.itemCost});
 }

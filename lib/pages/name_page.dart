@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+
 import 'package:split_receipt/misc/name_handler.dart';
 
 class NamePage extends StatefulWidget {
-  final void Function(int, String) myCallback;
-  const NamePage({required this.myCallback, super.key});
+  const NamePage({super.key});
 
   @override
   State<NamePage> createState() {
@@ -13,18 +13,21 @@ class NamePage extends StatefulWidget {
 
 class _NamePageState extends State<NamePage> {
 
-  void updatedText (int nameID, String name) {
-    print('This is _NamePageState'+'$nameID: $name');
-    () => widget.myCallback(nameID, name);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView(
-        children: [
-          NameHandler(nameID: 1, myCallback: updatedText),
-          NameHandler(nameID: 2, myCallback: updatedText),
+        children: const [
+          NameHandler(nameID: 0),
+          NameHandler(nameID: 1),
+          NameHandler(nameID: 2),
+          NameHandler(nameID: 3),
+          NameHandler(nameID: 4),
+          NameHandler(nameID: 5),
+          NameHandler(nameID: 6),
+          NameHandler(nameID: 7),
+          NameHandler(nameID: 8),
+          NameHandler(nameID: 9),
         ],
       ),
     );

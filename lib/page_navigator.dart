@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:split_receipt/pages/bill_page.dart';
 import 'package:split_receipt/pages/breakdown_page.dart';
 import 'package:split_receipt/pages/name_page.dart';
-
-import 'package:split_receipt/classes/classes.dart';
-
 class PageNavigator extends StatefulWidget {
   const PageNavigator({super.key});
 
@@ -18,14 +15,10 @@ class PageNavigator extends StatefulWidget {
 class _PageNavigatorState extends State<PageNavigator> {
   int pageID = 0;
 
-  void updatedName (int nameID, String name) {
-    print('This is _PageNavigatorState'+'$nameID: $name');
-  }
-
   final List<Widget> pages = [
     const BillPage(),
     const BreakDownPage(),
-    NamePage(myCallback: updatedName),
+    const NamePage(),
   ];
 
   @override
@@ -41,8 +34,6 @@ class _PageNavigatorState extends State<PageNavigator> {
         onTap: (int index) {
           setState(() {
             pageID = index;
-            debugPrint('Im on this page');
-            debugPrint('$pageID');
           });
         }
       ),
