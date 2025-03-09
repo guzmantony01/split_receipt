@@ -18,6 +18,24 @@ class NameProvider extends ChangeNotifier {
   void removeProfile({required int inputNameID}) {
     _profile.removeAt(inputNameID);
   }
+
+  void cleanUpProfiles() {
+    for(int i = 0; i < _profile.length; i++) {
+      if(_profile[i].name.isEmpty) {
+        _profile.removeAt(i);
+        i -= 1;
+      }
+    }
+  }
+
+  List<String> getDropDownMenuEntries() {
+    List<String> nameList = [];
+    nameList.add("");
+    for(int i = 0; i < _profile.length; i++) {
+      nameList.add(_profile[i].name);
+    }
+    return nameList;
+  }
   
   List<Profile> get getProfile {
     return _profile;

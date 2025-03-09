@@ -10,7 +10,7 @@ class Item {
   int itemID;
   String itemName;
   double itemCost;
-  int itemHolderID;
+  String profileHolder;
 
-  Item(this.itemID, this.itemName, this.itemCost, this.itemHolderID);
+  Item(this.itemID, this.itemName, this.itemCost, this.profileHolder);
 }

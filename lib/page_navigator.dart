@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:split_receipt/providers/item_provider.dart';
+import 'package:split_receipt/providers/name_provider.dart';
 
 import 'package:split_receipt/pages/bill_page.dart';
 import 'package:split_receipt/pages/breakdown_page.dart';
@@ -13,7 +17,7 @@ class PageNavigator extends StatefulWidget {
 }
 
 class _PageNavigatorState extends State<PageNavigator> {
-  int pageID = 0;
+  int pageID = 1;
 
   final List<Widget> pages = [
     const BillPage(),
@@ -34,6 +38,8 @@ class _PageNavigatorState extends State<PageNavigator> {
         onTap: (int index) {
           setState(() {
             pageID = index;
+            context.read<NameProvider>().cleanUpProfiles();
+            context.read<ItemProvider>().cleanUpItems();
           });
         }
       ),

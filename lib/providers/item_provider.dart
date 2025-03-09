@@ -4,11 +4,11 @@ import 'package:split_receipt/classes/classes.dart';
 
 class ItemProvider extends ChangeNotifier {
   final List<Item> _item = [
-    Item(0, "", 0.00, 99),
+    Item(0, "", 0.00, ""),
   ];
 
-  void addItem({required int newItemID, required String newItemName, required double newItemCost, required int newitemHolderID}) {
-    _item.add(Item(newItemID, newItemName, newItemCost, newitemHolderID));
+  void addItem({required int newItemID, required String newItemName, required double newItemCost, required String newProfileHolder}) {
+    _item.add(Item(newItemID, newItemName, newItemCost, newProfileHolder));
   }
   
   void updateItemName({required int updatingItemID, required String updatingItemName}) {
@@ -19,28 +19,37 @@ class ItemProvider extends ChangeNotifier {
     _item[updatingItemID].itemCost = updatingItemCost;
   }
 
-  void updateitemHolderID({required int updatingItemID, required int updatingitemHolderID}) {
-    _item[updatingItemID].itemHolderID = updatingitemHolderID;
+  void updateItemHolder({required int updatingItemID, required String updatingProfileHolder}) {
+    _item[updatingItemID].profileHolder = updatingProfileHolder;
   }
 
   void removeItem({required int inputItemID}) {
     _item.removeAt(inputItemID);
   }
 
-  int countInventory({required int inputNameID}) {
+  void cleanUpItems() {
+    for(int i = 0; i < _item.length; i++) {
+      if(_item[i].itemName.isEmpty) {
+        _item.removeAt(i);
+        i -= 1;
+      }
+    }
+  }
+
+  int countInventory({required String inputProfileName}) {
     int inventoryCounter = 0;
     for(int i = 0; i < _item.length; i++) {
-      if(_item[i].itemHolderID == inputNameID) {
+      if(_item[i].profileHolder == inputProfileName) {
         inventoryCounter++;
       }
     }
     return inventoryCounter;
   }
 
-  String populateItemName({required int inputNameID, required int totalCount, required int index}) {
+  String populateItemName({required String inputProfileName, required int index}) {
     int runningCount = 0;
     for(int i = 0; i < _item.length; i++) {
-      if(_item[i].itemHolderID == inputNameID) {
+      if(_item[i].profileHolder == inputProfileName) {
         if(runningCount == index) {
           return _item[i].itemName;
         } else {
@@ -51,10 +60,10 @@ class ItemProvider extends ChangeNotifier {
     return "";
   }
 
-  double populateItemCost({required int inputNameID, required int totalCount, required int index}) {
+  double populateItemCost({required String inputProfileName, required int index}) {
     int runningCount = 0;
     for(int i = 0; i < _item.length; i++) {
-      if(_item[i].itemHolderID == inputNameID) {
+      if(_item[i].profileHolder == inputProfileName) {
         if(runningCount == index) {
           return _item[i].itemCost;
         } else {
@@ -65,12 +74,20 @@ class ItemProvider extends ChangeNotifier {
     return 0.00;
   }
 
-  double calculateTotalCost({required int inputNameID}) {
+  double calculateProfileTotalCost({required String inputProfileName}) {
     double runningCost = 0.00;
     for(int i = 0; i < _item.length; i++) {
-      if(_item[i].itemHolderID == inputNameID) {
+      if(_item[i].profileHolder == inputProfileName) {
         runningCost += _item[i].itemCost;
       }
+    }
+    return runningCost;
+  }
+
+  double calculateTotalCost() {
+    double runningCost = 0.00;
+    for(int i = 0; i < _item.length; i++) {
+      runningCost += _item[i].itemCost;
     }
     return runningCost;
   }
