@@ -1,28 +1,82 @@
 import 'package:flutter/material.dart';
-
 import 'package:split_receipt/classes/classes.dart';
 
+
 class ItemProvider extends ChangeNotifier {
-  final List<Items> _items = [
-    Items(itemID: 0, itemName: "0", itemCost: 0.00),
-    Items(itemID: 1, itemName: "1", itemCost: 1.00),
-    Items(itemID: 2, itemName: "2", itemCost: 2.00),
-    Items(itemID: 3, itemName: "3", itemCost: 3.00),
-    Items(itemID: 4, itemName: "4", itemCost: 4.00),
-    Items(itemID: 5, itemName: "5", itemCost: 5.00),
-    Items(itemID: 6, itemName: "6", itemCost: 6.00),
-    Items(itemID: 7, itemName: "7", itemCost: 7.00),
-    Items(itemID: 8, itemName: "8", itemCost: 8.00),
-    Items(itemID: 9, itemName: "9", itemCost: 9.00),
+  final List<Item> _item = [
+    Item(0, "", 0.00, 99),
   ];
 
-  void changeBillable({required int newItemID, required String newItemName, required double newItemCost}) {
-    _items[newItemID].itemName = newItemName;
-    _items[newItemID].itemCost = newItemCost;
+  void addItem({required int newItemID, required String newItemName, required double newItemCost, required int newitemHolderID}) {
+    _item.add(Item(newItemID, newItemName, newItemCost, newitemHolderID));
   }
   
-  List<Items> get getItems {
-    return _items;
+  void updateItemName({required int updatingItemID, required String updatingItemName}) {
+    _item[updatingItemID].itemName = updatingItemName;
+  }
+
+  void updateItemCost({required int updatingItemID, required double updatingItemCost}) {
+    _item[updatingItemID].itemCost = updatingItemCost;
+  }
+
+  void updateitemHolderID({required int updatingItemID, required int updatingitemHolderID}) {
+    _item[updatingItemID].itemHolderID = updatingitemHolderID;
+  }
+
+  void removeItem({required int inputItemID}) {
+    _item.removeAt(inputItemID);
+  }
+
+  int countInventory({required int inputNameID}) {
+    int inventoryCounter = 0;
+    for(int i = 0; i < _item.length; i++) {
+      if(_item[i].itemHolderID == inputNameID) {
+        inventoryCounter++;
+      }
+    }
+    return inventoryCounter;
+  }
+
+  String populateItemName({required int inputNameID, required int totalCount, required int index}) {
+    int runningCount = 0;
+    for(int i = 0; i < _item.length; i++) {
+      if(_item[i].itemHolderID == inputNameID) {
+        if(runningCount == index) {
+          return _item[i].itemName;
+        } else {
+          runningCount++;
+        }
+      }
+    }
+    return "";
+  }
+
+  double populateItemCost({required int inputNameID, required int totalCount, required int index}) {
+    int runningCount = 0;
+    for(int i = 0; i < _item.length; i++) {
+      if(_item[i].itemHolderID == inputNameID) {
+        if(runningCount == index) {
+          return _item[i].itemCost;
+        } else {
+          runningCount++;
+        }
+      }
+    }
+    return 0.00;
+  }
+
+  double calculateTotalCost({required int inputNameID}) {
+    double runningCost = 0.00;
+    for(int i = 0; i < _item.length; i++) {
+      if(_item[i].itemHolderID == inputNameID) {
+        runningCost += _item[i].itemCost;
+      }
+    }
+    return runningCost;
+  }
+
+  List<Item> get getItem {
+    return _item;
   }
 
 }

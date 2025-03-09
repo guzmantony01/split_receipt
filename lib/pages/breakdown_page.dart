@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:split_receipt/providers/name_provider.dart';
-
-import 'package:split_receipt/misc/breakdown_handler.dart';
+import 'package:split_receipt/providers/item_provider.dart';
 
 
 class BreakDownPage extends StatefulWidget {
@@ -17,30 +16,104 @@ class BreakDownPage extends StatefulWidget {
 
 class _BreakDownPageState extends State<BreakDownPage> {
 
-  final List<String> test = [
-    "test1",
-    "test2"
-  ];
+  int nameBoxHeight = 35;
+  int itemBoxHeight = 20;
+  int totalCostBoxHeight = 20;
+  int lineThickness = 1;
+
+  double totalBoxCalculate(int numItemBox) {
+    return (nameBoxHeight + (itemBoxHeight * numItemBox) + totalCostBoxHeight + lineThickness).toDouble();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NameProvider>(builder: (context, providerItem, child) {
-      return Scaffold(
-        body: ListView(
-          children: const [
-            BreakdownHandler(nameID: 0),
-            BreakdownHandler(nameID: 1),
-            BreakdownHandler(nameID: 2),
-            BreakdownHandler(nameID: 3),
-            BreakdownHandler(nameID: 4),
-            BreakdownHandler(nameID: 5),
-            BreakdownHandler(nameID: 6),
-            BreakdownHandler(nameID: 7),
-            BreakdownHandler(nameID: 8),
-            BreakdownHandler(nameID: 9),
-          ],
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 15, right: 15, top: 30),
+          child: Text("Breakdown Cost", style: TextStyle(fontSize: 20),),
         ),
-      );
-    });
+        const SizedBox(
+          height: 1,
+        ),
+        ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          shrinkWrap: true,
+          itemCount: context.read<NameProvider>().getProfile.length,
+          itemBuilder: (context, indexName) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                height: totalBoxCalculate(context.read<ItemProvider>().countInventory(inputNameID: indexName)),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.blue[200],
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: 35,
+                      child: Text(
+                        context.read<NameProvider>().getProfile[indexName].name,
+                        style: const TextStyle(
+                          fontSize: 25,
+                        ),
+                      ),
+                    ),
+                    ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 1),
+                      shrinkWrap: true,
+                      itemCount: context.read<ItemProvider>().countInventory(inputNameID: indexName),
+                      itemBuilder: (context, indexItem) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 1),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SizedBox(
+                                height: 20,
+                                child: Text(
+                                  context.read<ItemProvider>().populateItemName(inputNameID: indexName, totalCount: context.read<ItemProvider>().countInventory(inputNameID: indexName), index: indexItem),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 20,
+                                child: Text(
+                                  context.read<ItemProvider>().populateItemCost(inputNameID: indexName, totalCount: context.read<ItemProvider>().countInventory(inputNameID: indexName), index: indexItem).toStringAsFixed(2),
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                    const Divider(height: 1, thickness: 1, indent: 5, endIndent: 5, color: Colors.black),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 1),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Total Cost:'),
+                          Text(context.read<ItemProvider>().calculateTotalCost(inputNameID: indexName).toStringAsFixed(2)),
+                        ],
+                      ),
+                    ),
+                  ]
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
   }
 }
