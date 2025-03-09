@@ -28,7 +28,7 @@ class ItemProvider extends ChangeNotifier {
   }
 
   void cleanUpItems() {
-    for(int i = 0; i < _item.length; i++) {
+    for(int i = 1; i < _item.length; i++) {
       if(_item[i].itemName.isEmpty) {
         _item.removeAt(i);
         i -= 1;

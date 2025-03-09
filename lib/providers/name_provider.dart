@@ -20,7 +20,7 @@ class NameProvider extends ChangeNotifier {
   }
 
   void cleanUpProfiles() {
-    for(int i = 0; i < _profile.length; i++) {
+    for(int i = 1; i < _profile.length; i++) {
       if(_profile[i].name.isEmpty) {
         _profile.removeAt(i);
         i -= 1;
