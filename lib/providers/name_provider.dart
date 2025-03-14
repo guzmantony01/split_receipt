@@ -26,6 +26,9 @@ class NameProvider extends ChangeNotifier {
         i -= 1;
       }
     }
+    if((_profile.length > 1) && (_profile[0].name.isEmpty)) {
+      _profile.removeAt(0);
+    }
   }
 
   List<String> getDropDownMenuEntries() {

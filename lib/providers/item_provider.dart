@@ -34,16 +34,18 @@ class ItemProvider extends ChangeNotifier {
         i -= 1;
       }
     }
+    if((_item.length > 1) && (_item[0].itemName.isEmpty)) {
+      _item.removeAt(0);
+    }
   }
 
-  int countInventory({required String inputProfileName}) {
-    int inventoryCounter = 0;
+  int countEmptyHolder() {
     for(int i = 0; i < _item.length; i++) {
-      if(_item[i].profileHolder == inputProfileName) {
-        inventoryCounter++;
+      if(_item[i].profileHolder == "") {
+        return 1;
       }
     }
-    return inventoryCounter;
+    return 0;
   }
 
   String populateItemName({required String inputProfileName, required int index}) {

@@ -33,7 +33,7 @@ class _BillPageState extends State<BillPage> {
       itemNameListController[i].text =
           context.read<ItemProvider>().getItem[i].itemName;
       itemCostController[i].text =
-          context.read<ItemProvider>().getItem[i].itemCost.toString();
+          context.read<ItemProvider>().getItem[i].itemCost.toStringAsFixed(2);
       itemHolderController[i].text =
           context.read<ItemProvider>().getItem[i].profileHolder;
     }
@@ -273,6 +273,7 @@ class _BillPageState extends State<BillPage> {
                 itemNameListController.add(TextEditingController());
                 itemCostController.add(TextEditingController());
                 itemHolderController.add(TextEditingController());
+                itemCostController[itemCostController.length - 1].text = "0.00";
               });
             },
             child: Center(

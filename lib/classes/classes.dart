@@ -14,3 +14,10 @@ class Item {
 
   Item(this.itemID, this.itemName, this.itemCost, this.profileHolder);
 }
+
+class ExtraCost {
+  double taxesAmount;
+  double tipAmount;
+
+  ExtraCost(this.taxesAmount, this.tipAmount);
+}
