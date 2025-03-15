@@ -190,7 +190,7 @@ class _BillPageState extends State<BillPage> {
                               } else {
                                 context.read<ItemProvider>().updateItemCost(updatingItemID: index, updatingItemCost: double.parse(text));
                               }
-                              context.read<ExtraFeesProvider>().updateMissingFields(context.read<ItemProvider>().calculatPreFeeCost());
+                              context.read<ExtraFeesProvider>().updateMissingFields(context.read<ItemProvider>().calculatePreFeeCost());
                               updateFees();
                             });
                           },
@@ -326,9 +326,9 @@ class _BillPageState extends State<BillPage> {
                               onChanged: (String text) {
                                 setState(() {
                                   if (double.tryParse(text) == null) {
-                                    context.read<ExtraFeesProvider>().updateTaxesAmount(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                    context.read<ExtraFeesProvider>().updateTaxesAmount(context.read<ItemProvider>().calculatePreFeeCost(), 0.00);
                                   } else {
-                                    context.read<ExtraFeesProvider>().updateTaxesAmount(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                    context.read<ExtraFeesProvider>().updateTaxesAmount(context.read<ItemProvider>().calculatePreFeeCost(), double.parse(text));
                                   }
                                   taxesPercentController.text = context.read<ExtraFeesProvider>().getFees.taxesPercent.toStringAsFixed(2);
                                 });
@@ -345,9 +345,9 @@ class _BillPageState extends State<BillPage> {
                               onChanged: (String text) {
                                 setState(() {
                                   if (double.tryParse(text) == null) {
-                                    context.read<ExtraFeesProvider>().updateTaxesPercent(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                    context.read<ExtraFeesProvider>().updateTaxesPercent(context.read<ItemProvider>().calculatePreFeeCost(), 0.00);
                                   } else {
-                                    context.read<ExtraFeesProvider>().updateTaxesPercent(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                    context.read<ExtraFeesProvider>().updateTaxesPercent(context.read<ItemProvider>().calculatePreFeeCost(), double.parse(text));
                                   }
                                   taxesAmountController.text = context.read<ExtraFeesProvider>().getFees.taxesAmount.toStringAsFixed(2);
                                 });
@@ -374,9 +374,9 @@ class _BillPageState extends State<BillPage> {
                               onChanged: (String text) {
                                 setState(() {
                                   if (double.tryParse(text) == null) {
-                                    context.read<ExtraFeesProvider>().updateTipsAmount(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                    context.read<ExtraFeesProvider>().updateTipsAmount(context.read<ItemProvider>().calculatePreFeeCost(), 0.00);
                                   } else {
-                                    context.read<ExtraFeesProvider>().updateTipsAmount(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                    context.read<ExtraFeesProvider>().updateTipsAmount(context.read<ItemProvider>().calculatePreFeeCost(), double.parse(text));
                                   }
                                   tipsPercentController.text = context.read<ExtraFeesProvider>().getFees.tipPercent.toStringAsFixed(2);
                                 });
@@ -393,9 +393,9 @@ class _BillPageState extends State<BillPage> {
                               onChanged: (String text) {
                                 setState(() {
                                   if (double.tryParse(text) == null) {
-                                    context.read<ExtraFeesProvider>().updateTipsPercent(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                    context.read<ExtraFeesProvider>().updateTipsPercent(context.read<ItemProvider>().calculatePreFeeCost(), 0.00);
                                   } else {
-                                    context.read<ExtraFeesProvider>().updateTipsPercent(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                    context.read<ExtraFeesProvider>().updateTipsPercent(context.read<ItemProvider>().calculatePreFeeCost(), double.parse(text));
                                   }
                                   tipsAmountController.text = context.read<ExtraFeesProvider>().getFees.tipAmount.toStringAsFixed(2);
                                 });

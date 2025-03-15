@@ -25,6 +25,23 @@ class _PageNavigatorState extends State<PageNavigator> {
     const NamePage(),
   ];
 
+  void itemHolderCleaner() {
+    bool holderProfileFound = true;
+    int itemLength = context.read<ItemProvider>().getItem.length;
+    int profileLength = context.read<NameProvider>().getProfile.length;
+    for(int i = 0; i < itemLength; i++) {
+      for(int j = 0; j < profileLength; j++) {
+        if(context.read<ItemProvider>().getItem[i].profileHolder == context.read<NameProvider>().getProfile[j].name) {
+          holderProfileFound = true;
+        }
+        if((j == (profileLength - 1)) && (holderProfileFound == false)) {
+          context.read<ItemProvider>().getItem[i].profileHolder = "";
+        }
+      }
+      holderProfileFound = false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,6 +57,7 @@ class _PageNavigatorState extends State<PageNavigator> {
             pageID = index;
             context.read<NameProvider>().cleanUpProfiles();
             context.read<ItemProvider>().cleanUpItems();
+            itemHolderCleaner();
           });
         }
       ),

@@ -86,7 +86,7 @@ class ItemProvider extends ChangeNotifier {
     return runningCost;
   }
 
-  double calculatPreFeeCost() {
+  double calculatePreFeeCost() {
     double runningCost = 0.00;
     for(int i = 0; i < _item.length; i++) {
       runningCost += _item[i].itemCost;
