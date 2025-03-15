@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:split_receipt/providers/extrafees_provider.dart';
 import 'package:split_receipt/providers/item_provider.dart';
 import 'package:split_receipt/providers/name_provider.dart';
 
@@ -14,11 +15,15 @@ class BillPage extends StatefulWidget {
 }
 
 class _BillPageState extends State<BillPage> {
-  List<TextEditingController> itemNameListController = [
-    TextEditingController()
-  ];
+
+  List<TextEditingController> itemNameListController = [TextEditingController()];
   List<TextEditingController> itemCostController = [TextEditingController()];
   List<TextEditingController> itemHolderController = [TextEditingController()];
+
+  TextEditingController taxesAmountController = TextEditingController();
+  TextEditingController taxesPercentController = TextEditingController();
+  TextEditingController tipsAmountController = TextEditingController();
+  TextEditingController tipsPercentController = TextEditingController();
 
   @override
   void initState() {
@@ -37,6 +42,17 @@ class _BillPageState extends State<BillPage> {
       itemHolderController[i].text =
           context.read<ItemProvider>().getItem[i].profileHolder;
     }
+    taxesAmountController.text = context.read<ExtraFeesProvider>().getFees.taxesAmount.toStringAsFixed(2);
+    taxesPercentController.text = context.read<ExtraFeesProvider>().getFees.taxesPercent.toStringAsFixed(2);
+    tipsAmountController.text = context.read<ExtraFeesProvider>().getFees.tipAmount.toStringAsFixed(2);
+    tipsPercentController.text = context.read<ExtraFeesProvider>().getFees.tipPercent.toStringAsFixed(2);
+  }
+
+  void updateFees() {
+    taxesAmountController.text = context.read<ExtraFeesProvider>().getFees.taxesAmount.toStringAsFixed(2);
+    taxesPercentController.text = context.read<ExtraFeesProvider>().getFees.taxesPercent.toStringAsFixed(2);
+    tipsAmountController.text = context.read<ExtraFeesProvider>().getFees.tipAmount.toStringAsFixed(2);
+    tipsPercentController.text = context.read<ExtraFeesProvider>().getFees.tipPercent.toStringAsFixed(2);
   }
 
   @override
@@ -142,11 +158,13 @@ class _BillPageState extends State<BillPage> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: TextFormField(
+                          decoration: const InputDecoration(labelText: 'Item Name'),
                           controller: itemNameListController[index],
-                          onChanged: (String text) => context
-                              .read<ItemProvider>()
-                              .updateItemName(
-                                  updatingItemID: index, updatingItemName: text),
+                          onChanged: (String text) {
+                            setState(() {
+                              context.read<ItemProvider>().updateItemName(updatingItemID: index, updatingItemName: text);
+                            });
+                          },
                         ),
                       ),
                     ),
@@ -163,16 +181,18 @@ class _BillPageState extends State<BillPage> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: TextFormField(
+                          decoration: const InputDecoration(labelText: 'Item Cost'),
                           controller: itemCostController[index],
                           onChanged: (String text) {
-                            if (double.tryParse(text) == null) {
-                              context.read<ItemProvider>().updateItemCost(
-                                  updatingItemID: index, updatingItemCost: 0.00);
-                            } else {
-                              context.read<ItemProvider>().updateItemCost(
-                                  updatingItemID: index,
-                                  updatingItemCost: double.parse(text));
-                            }
+                            setState(() {
+                              if (double.tryParse(text) == null) {
+                                context.read<ItemProvider>().updateItemCost(updatingItemID: index, updatingItemCost: 0.00);
+                              } else {
+                                context.read<ItemProvider>().updateItemCost(updatingItemID: index, updatingItemCost: double.parse(text));
+                              }
+                              context.read<ExtraFeesProvider>().updateMissingFields(context.read<ItemProvider>().calculatPreFeeCost());
+                              updateFees();
+                            });
                           },
                         ),
                       ),
@@ -190,14 +210,11 @@ class _BillPageState extends State<BillPage> {
                           borderRadius: BorderRadius.circular(5),
                         ),
                         child: DropdownButton<String>(
-                          value: itemHolderController[index].text.isEmpty ||
-                                  !context
-                                      .read<NameProvider>()
-                                      .getDropDownMenuEntries()
-                                      .contains(itemHolderController[index].text)
+                          value: itemHolderController[index].text.isEmpty || !context.read<NameProvider>().getDropDownMenuEntries().contains(itemHolderController[index].text)
                               ? null // Set to null if the value doesn't exist in the list
                               : itemHolderController[index].text,
                           icon: const Icon(Icons.arrow_downward),
+                          hint: const Text('Select'),
                           elevation: 16,
                           style: const TextStyle(color: Colors.deepPurple),
                           underline: Container(
@@ -205,17 +222,11 @@ class _BillPageState extends State<BillPage> {
                           onChanged: (String? value) {
                             setState(() {
                               itemHolderController[index].text = value.toString();
-                              context.read<ItemProvider>().updateItemHolder(
-                                  updatingItemID: index,
-                                  updatingProfileHolder: value.toString());
+                              context.read<ItemProvider>().updateItemHolder(updatingItemID: index,updatingProfileHolder: value.toString());
                             });
                           },
-                          items: context
-                              .read<NameProvider>()
-                              .getDropDownMenuEntries()
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                                value: value, child: Text(value));
+                          items: context.read<NameProvider>().getDropDownMenuEntries().map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(value: value, child: Text(value));
                           }).toList(),
                         ),
                       ),
@@ -303,22 +314,104 @@ class _BillPageState extends State<BillPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Taxes:'),
-                    Text('Taxes TextFormField goes here.'),
+                    const Expanded(child: SizedBox(width: 10, child: Text('Taxes:'),),),
+                    Expanded(  // Wrap this row to allow it to expand properly
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(  // Wrap TextFormField to avoid overflow
+                            child: TextFormField(
+                              decoration: const InputDecoration(labelText: 'Exact Amount', labelStyle: TextStyle(fontSize: 14)),
+                              controller: taxesAmountController,
+                              onChanged: (String text) {
+                                setState(() {
+                                  if (double.tryParse(text) == null) {
+                                    context.read<ExtraFeesProvider>().updateTaxesAmount(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                  } else {
+                                    context.read<ExtraFeesProvider>().updateTaxesAmount(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                  }
+                                  taxesPercentController.text = context.read<ExtraFeesProvider>().getFees.taxesPercent.toStringAsFixed(2);
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10,),
+                          const Text('Or'),
+                          const SizedBox(width: 10,),
+                          Expanded(  // Wrap the second TextFormField as well
+                            child: TextFormField(
+                              decoration: const InputDecoration(labelText: 'Percentage(%)', labelStyle: TextStyle(fontSize: 14)),
+                              controller: taxesPercentController,
+                              onChanged: (String text) {
+                                setState(() {
+                                  if (double.tryParse(text) == null) {
+                                    context.read<ExtraFeesProvider>().updateTaxesPercent(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                  } else {
+                                    context.read<ExtraFeesProvider>().updateTaxesPercent(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                  }
+                                  taxesAmountController.text = context.read<ExtraFeesProvider>().getFees.taxesAmount.toStringAsFixed(2);
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('Tip:'),
-                    Text('Tips TextFormField goes here.'),
+                    const Expanded(child: SizedBox(width: 10, child: Text('Tips:'),),),
+                    Expanded(  // Wrap this row to allow it to expand properly
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(  // Wrap TextFormField to avoid overflow
+                            child: TextFormField(
+                              decoration: const InputDecoration(labelText: 'Exact Amount', labelStyle: TextStyle(fontSize: 14)),
+                              controller: tipsAmountController,
+                              onChanged: (String text) {
+                                setState(() {
+                                  if (double.tryParse(text) == null) {
+                                    context.read<ExtraFeesProvider>().updateTipsAmount(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                  } else {
+                                    context.read<ExtraFeesProvider>().updateTipsAmount(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                  }
+                                  tipsPercentController.text = context.read<ExtraFeesProvider>().getFees.tipPercent.toStringAsFixed(2);
+                                });
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10,),
+                          const Text('Or'),
+                          const SizedBox(width: 10,),
+                          Expanded(  // Wrap the second TextFormField as well
+                            child: TextFormField(
+                              decoration: const InputDecoration(labelText: 'Percentage(%)', labelStyle: TextStyle(fontSize: 14)),
+                              controller: tipsPercentController,
+                              onChanged: (String text) {
+                                setState(() {
+                                  if (double.tryParse(text) == null) {
+                                    context.read<ExtraFeesProvider>().updateTipsPercent(context.read<ItemProvider>().calculatPreFeeCost(), 0.00);
+                                  } else {
+                                    context.read<ExtraFeesProvider>().updateTipsPercent(context.read<ItemProvider>().calculatPreFeeCost(), double.parse(text));
+                                  }
+                                  tipsAmountController.text = context.read<ExtraFeesProvider>().getFees.tipAmount.toStringAsFixed(2);
+                                });
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Total Cost:'),
-                    Text(context.read<ItemProvider>().calculateTotalCost().toStringAsFixed(2)),
+                    Text(context.read<ItemProvider>().calculateTotalCost(context.read<ExtraFeesProvider>().getFees.taxesAmount, context.read<ExtraFeesProvider>().getFees.tipAmount).toStringAsFixed(2)),
                   ],
                 ),
               ],

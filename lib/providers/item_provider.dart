@@ -86,12 +86,20 @@ class ItemProvider extends ChangeNotifier {
     return runningCost;
   }
 
-  double calculateTotalCost() {
+  double calculatPreFeeCost() {
     double runningCost = 0.00;
     for(int i = 0; i < _item.length; i++) {
       runningCost += _item[i].itemCost;
     }
-    return runningCost;
+    return (runningCost);
+  }
+
+  double calculateTotalCost(double taxAmount, double tipAmount) {
+    double runningCost = 0.00;
+    for(int i = 0; i < _item.length; i++) {
+      runningCost += _item[i].itemCost;
+    }
+    return (runningCost + taxAmount + tipAmount);
   }
 
   List<Item> get getItem {
