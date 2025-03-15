@@ -6,6 +6,7 @@ import 'package:split_receipt/providers/extrafees_provider.dart';
 import 'package:split_receipt/providers/item_provider.dart';
 import 'package:split_receipt/providers/name_provider.dart';
 
+// Version 1.0
 void main() {
   runApp(
     MultiProvider(
