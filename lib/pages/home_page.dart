@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
+
 import 'package:split_receipt/model/provider.dart';
+import 'package:split_receipt/page_navigator.dart';
 
-class BillPage extends StatefulWidget {
-  const BillPage({required this.currentReceiptID, super.key});
-
-  final int currentReceiptID;
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  State<BillPage> createState() {
-    return _BillPageState();
+  State<HomePage> createState() {
+    return _HomePageState();
   }
 }
 
-class _BillPageState extends State<BillPage> {
+class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +45,12 @@ class _BillPageState extends State<BillPage> {
             color: Colors.black,
           ),
         ),
-        child: Center(child: Text('Add Items'),),
+        child: Center(child: Text('Reciepts'),),
       ),
     );
   }
 
   Widget _buildList(BuildContext context) {
-    final provider = context.read<RecieptProvider>();
     return SizedBox(
       child: Card(
         color: Colors.blue,
@@ -64,27 +62,30 @@ class _BillPageState extends State<BillPage> {
         ),
         child: Column(
           children: [
-            _buildAllItemList(context),
-            _addSingleItem(context),
+            _buildAllReceipt(context),
+            _addSingleReceipt(context),
           ],
         ),
       ),
     );
   }
 
-    Widget _buildAllItemList(BuildContext context,) {
+  Widget _buildAllReceipt(BuildContext context,) {
     final provider = context.read<RecieptProvider>();
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 15),
       shrinkWrap: true,
-      itemCount: provider.getAllItems(widget.currentReceiptID)?.length ?? 0,
+      itemCount: provider.getReceipt.length,
       itemBuilder: (context, index) {
         return Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _buildSingleItem(context, index),
+              children: [
+                _buildSingleReceipt(context, index),
+                _deleteSingleReceipt(context, index),
+              ],
             ),
             const Divider(height: 1, thickness: 1, color: Colors.black),
           ],
@@ -93,22 +94,31 @@ class _BillPageState extends State<BillPage> {
     );
   }
 
-  List<Widget> _buildSingleItem(BuildContext context, int index) {
-    final provider = context.read<RecieptProvider>().getReceipt[widget.currentReceiptID];
-    return [
-      Text(provider.items![index].name ?? 'Name $index'),
-      Text(provider.items![index].cost?.toStringAsFixed(2) ?? '0.00'),
-      Text('Holder $index'),
-      _deleteSingleItem(context, index),
-    ];
+  Widget _buildSingleReceipt(BuildContext context, int index) {
+    return GestureDetector(
+      onTap:() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PageNavigator(currentReceiptID: index), // Replace with your target page
+          ),
+        );
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Receipt: # $index'),
+        ],
+      ),
+    );
   }
 
-  Widget _deleteSingleItem(BuildContext context, int index) {
+  Widget _deleteSingleReceipt(BuildContext context, int index) {
     final provider = context.read<RecieptProvider>();
     return GestureDetector(
       onTap: () {
         setState(() {
-          provider.deleteItem(widget.currentReceiptID, index);
+          provider.deleteReceipt(index);
         });
       },
       child: const Icon(
@@ -118,12 +128,12 @@ class _BillPageState extends State<BillPage> {
     );
   }
 
-  Widget _addSingleItem(BuildContext context) {
+  Widget _addSingleReceipt(BuildContext context) {
     final provider = context.read<RecieptProvider>();
     return GestureDetector(
       onTap: () {
         setState(() {
-          provider.newItem(widget.currentReceiptID);
+          provider.newReceipt();
         });
       },
       child: const Icon(
