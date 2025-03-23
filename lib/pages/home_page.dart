@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:split_receipt/model/classes.dart';
 
 import 'package:split_receipt/model/provider.dart';
 import 'package:split_receipt/page_navigator.dart';
@@ -45,7 +46,7 @@ class _HomePageState extends State<HomePage> {
             color: Colors.black,
           ),
         ),
-        child: Center(child: Text('Reciepts'),),
+        child: Center(child: Text('Receipts'),),
       ),
     );
   }
@@ -70,13 +71,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildAllReceipt(BuildContext context,) {
-    final provider = context.read<RecieptProvider>();
+  Widget _buildAllReceipt(BuildContext context) {
+    final receiptList = context.read<ReceiptProvider>();
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 15),
       shrinkWrap: true,
-      itemCount: provider.getReceipt.length,
+      itemCount: receiptList.receipts.length,
       itemBuilder: (context, index) {
         return Column(
           children: [
@@ -95,6 +96,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildSingleReceipt(BuildContext context, int index) {
+    final receiptProvider = context.read<ReceiptProvider>();
     return GestureDetector(
       onTap:() {
         Navigator.push(
@@ -107,18 +109,19 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Receipt: # $index'),
+          Text(receiptProvider.receipts[index].name),
         ],
       ),
     );
   }
 
   Widget _deleteSingleReceipt(BuildContext context, int index) {
-    final provider = context.read<RecieptProvider>();
+    final receiptProvider = context.read<ReceiptProvider>();
     return GestureDetector(
       onTap: () {
         setState(() {
-          provider.deleteReceipt(index);
+          receiptProvider.receipts.removeAt(index);
+          receiptProvider.cleanUpReceipts();
         });
       },
       child: const Icon(
@@ -129,11 +132,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _addSingleReceipt(BuildContext context) {
-    final provider = context.read<RecieptProvider>();
+    final receiptProvider = context.read<ReceiptProvider>();
+    int newReceiptIndex = receiptProvider.receipts.length;
     return GestureDetector(
       onTap: () {
         setState(() {
-          provider.newReceipt();
+          receiptProvider.addReceipt(Receipt.create(id: newReceiptIndex, name: '', profiles: [], items: []));
         });
       },
       child: const Icon(

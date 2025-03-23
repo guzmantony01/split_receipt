@@ -1,30 +1,84 @@
 class Receipt {
   int id;
-  List<Profile>? profiles;
-  List<Item>? items;
-  Fees? fees;
+  String name;
+  List<Profile> profiles;
+  List<Item> items;
+  Fees fees;
 
-  Receipt(this.id, this.profiles, this.items, this.fees);
+  Receipt({
+    required this.id,
+    required this.name,
+    required this.profiles,
+    required this.items,
+    required this.fees,
+  });
+
+  factory Receipt.create({
+    required int id,
+    required String name,
+    required List<Profile> profiles,
+    required List<Item> items,
+    Fees? fees,
+  }) {
+    return Receipt(
+      id: id,
+      name: 'Receipt #$id',
+      profiles: profiles,
+      items: items,
+      fees: fees ?? Fees(tax: 0.0, tip: 0.0), // Default fees if not provided
+    );
+  }
 }
 
 class Profile {
   String name;
-  List<Item> items;
 
-  Profile(this.name, this.items);
+  Profile({
+    required this.name,
+  });
+
+  factory Profile.create({
+    String name = '',
+  }) {
+    return Profile(
+      name: name,
+    );
+  }
 }
 
 class Item {
-  int id;
-  String? name;
-  double? cost;
+  String name;
+  double cost;
+  String buyer;
 
-  Item(this.id, this.name, this.cost);
+  Item({
+    required this.name,
+    required this.cost,
+    required this.buyer,
+  });
+
+  factory Item.create({
+    String name = '',
+    double cost = 0.00,
+    String buyer = '',
+  }) {
+    return Item(
+      name: name,
+      cost: cost,
+      buyer: buyer,
+    );
+  }
 }
 
 class Fees {
   double tax;
   double tip;
 
-  Fees(this.tax, this.tip);
+  Fees({
+    required this.tax,
+    required this.tip,
+  });
+
+  double get total => tax + tip;
 }
+

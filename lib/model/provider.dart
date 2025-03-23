@@ -2,53 +2,67 @@ import 'package:flutter/material.dart';
 
 import 'package:split_receipt/model/classes.dart';
 
-class RecieptProvider extends ChangeNotifier {
-  List<Receipt> _receipt = List.empty(growable: true);
+class ReceiptProvider with ChangeNotifier {
+  final List<Receipt> _receipts = [];
 
-  /// Fees Functions
-  Fees? getFees(int receiptID) {
-    return _receipt[receiptID].fees;
-  }
+  List<Receipt> get receipts => _receipts;
 
-  /// AllItems Functions
-  List<Item>? getAllItems(int receiptID) {
-    return _receipt[receiptID].items;
-  }
-
-  void newItem(int receiptID) {
-    if (_receipt[receiptID].items == null) {
-      _receipt[receiptID].items = [];  // Initialize to an empty list if it's null
+  // Create a new receipt or get an existing one by ID
+  Receipt getReceiptById(int id) {
+    if (_receipts.isEmpty) {
+      throw StateError('No receipts available');
     }
-
-    int index = _receipt[receiptID].items!.length; // ! is used to tell it will never be null.
-    _receipt[receiptID].items?.add(Item((index + 1), null, null));
+    return _receipts.firstWhere((receipt) => receipt.id == id, orElse: () {
+      throw StateError('Receipt with id $id not found');
+    });
   }
 
-  void deleteItem(int receiptID, int itemID) {
-    _receipt[receiptID].items?.removeAt(itemID);
+  // Renumber Receipt IDs
+  void cleanUpReceipts() {
+    int receiptsLength = _receipts.length;
+    for (int receiptIndex = 0; receiptIndex < receiptsLength; receiptIndex++) {
+      _receipts[receiptIndex].id = receiptIndex;
+    }
   }
 
-  /// Profile Functions
-  List<Profile>? getProfiles(int receiptID) {
-    return _receipt[receiptID].profiles;
+  // Add a new receipt
+  void addReceipt(Receipt receipt) {
+    _receipts.add(receipt);
   }
 
-  /// Profile Items Functions
-  List<Item>? getItemsFromProfile(int receiptID, int profileID) {
-    return _receipt[receiptID].profiles?[profileID].items;
+  // Add a profile to a specific receipt
+  void addProfile(int receiptId, Profile profile) {
+    final receipt = getReceiptById(receiptId);
+    receipt.profiles.add(profile);
   }
 
-  /// Receipt Functions
-  List<Receipt> get getReceipt {
-    return _receipt;
+  // Delete a profile from a receipt
+  void deleteProfile(int receiptId, int profileIndex) {
+    final receipt = getReceiptById(receiptId);
+    receipt.profiles.removeAt(profileIndex);
   }
 
-  void newReceipt() {
-    int index = _receipt.length;
-    _receipt.add(Receipt((index + 1), null, null, null));
+  // Add a profile to a specific receipt
+  void addItem(int receiptId, Item item) {
+    final receipt = getReceiptById(receiptId);
+    receipt.items.add(item);
   }
 
-  void deleteReceipt(int receiptID) {
-    _receipt.removeAt(receiptID);
+  // Delete a profile from a receipt
+  void deleteItem(int receiptId, int itemIndex) {
+    final receipt = getReceiptById(receiptId);
+    receipt.items.removeAt(itemIndex);
+  }
+
+  // Update an existing profile's name
+  void updateProfileName(int receiptId, int profileIndex, String newName) {
+    final receipt = getReceiptById(receiptId);
+    receipt.profiles[profileIndex].name = newName;
+  }
+
+  // Update the fees (tax and tip) for a specific receipt
+  void updateFees(int receiptId, double tax, double tip) {
+    final receipt = getReceiptById(receiptId);
+    receipt.fees = Fees(tax: tax, tip: tip);
   }
 }

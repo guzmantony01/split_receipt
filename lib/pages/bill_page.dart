@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:split_receipt/model/classes.dart';
 import 'package:provider/provider.dart';
 import 'package:split_receipt/model/provider.dart';
 
@@ -15,6 +15,32 @@ class BillPage extends StatefulWidget {
 }
 
 class _BillPageState extends State<BillPage> {
+  List<TextEditingController> itemNameTextController = [];
+  List<TextEditingController> itemCostTextController = [];
+  List<TextEditingController> buyerTextController = [];
+
+  @override
+  void initState() {
+    super.initState();
+    final receiptProvider = context.read<ReceiptProvider>();
+
+    // Get length of the receipts.items length
+    int itemLength = receiptProvider.receipts[widget.currentReceiptID].items.length;
+    if (itemLength > 0) {
+      // Loop through every item
+      for (int itemIndex = 0; itemIndex < itemLength; itemIndex++) {
+        // Add a TextController for every receipts.items length
+        itemNameTextController.add(TextEditingController());
+        itemCostTextController.add(TextEditingController());
+        buyerTextController.add(TextEditingController());
+
+        // Get receipts.items.name and receipts.items.cost and put into their respective TextController
+        itemNameTextController[itemIndex].text = receiptProvider.receipts[widget.currentReceiptID].items[itemIndex].name;
+        itemCostTextController[itemIndex].text = receiptProvider.receipts[widget.currentReceiptID].items[itemIndex].cost.toStringAsFixed(2);
+        buyerTextController[itemIndex].text = receiptProvider.receipts[widget.currentReceiptID].items[itemIndex].buyer;
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +78,6 @@ class _BillPageState extends State<BillPage> {
   }
 
   Widget _buildList(BuildContext context) {
-    final provider = context.read<RecieptProvider>();
     return SizedBox(
       child: Card(
         color: Colors.blue,
@@ -64,6 +89,8 @@ class _BillPageState extends State<BillPage> {
         ),
         child: Column(
           children: [
+            _buildItemTableHeader(context),
+            const Divider(height: 1, thickness: 1, color: Colors.black),
             _buildAllItemList(context),
             _addSingleItem(context),
           ],
@@ -72,19 +99,42 @@ class _BillPageState extends State<BillPage> {
     );
   }
 
-    Widget _buildAllItemList(BuildContext context,) {
-    final provider = context.read<RecieptProvider>();
+  Widget _buildItemTableHeader(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 15),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text('Item Name'),
+          ),
+          Expanded(
+            flex: 1,
+            child: Text('Cost'),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text('Buyer'),
+          ),
+          SizedBox(width: 30,),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAllItemList(BuildContext context) {
+    final receiptProvider = context.read<ReceiptProvider>();
     return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 15),
       shrinkWrap: true,
-      itemCount: provider.getAllItems(widget.currentReceiptID)?.length ?? 0,
-      itemBuilder: (context, index) {
+      itemCount: receiptProvider.receipts[widget.currentReceiptID].items.length,
+      itemBuilder: (context, itemIndex) {
         return Column(
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: _buildSingleItem(context, index),
+              children: _buildSingleItem(context, itemIndex),
             ),
             const Divider(height: 1, thickness: 1, color: Colors.black),
           ],
@@ -93,22 +143,62 @@ class _BillPageState extends State<BillPage> {
     );
   }
 
-  List<Widget> _buildSingleItem(BuildContext context, int index) {
-    final provider = context.read<RecieptProvider>().getReceipt[widget.currentReceiptID];
+  List<Widget> _buildSingleItem(BuildContext context, int itemIndex) {
+    final receiptProvider = context.read<ReceiptProvider>();
     return [
-      Text(provider.items![index].name ?? 'Name $index'),
-      Text(provider.items![index].cost?.toStringAsFixed(2) ?? '0.00'),
-      Text('Holder $index'),
-      _deleteSingleItem(context, index),
+      // Handles the Item Name portion per item
+      Expanded(
+        flex: 2,
+        child: TextFormField(
+          decoration: const InputDecoration(
+            label: Text('Name'),
+          ),
+          controller: itemNameTextController[itemIndex],
+          onChanged: (value) {
+            receiptProvider.receipts[widget.currentReceiptID].items[itemIndex].name = value;
+          },
+        ),
+      ),
+      // Handles the Item Cost portion per item
+      Expanded(
+        flex: 1,
+        child: TextFormField(
+          decoration: const InputDecoration(
+            label: Text('Cost'),
+          ),
+          controller: itemCostTextController[itemIndex],
+          onChanged: (value) {
+            receiptProvider.receipts[widget.currentReceiptID].items[itemIndex].cost = double.tryParse(value) ?? 0.00;
+          },
+        ),
+      ),
+      // Handles the Item Buyer portion per item
+      Expanded(
+        flex: 3,
+        child: TextFormField(
+          decoration: const InputDecoration(
+            label: Text('Buyer'),
+          ),
+          controller: buyerTextController[itemIndex],
+          onChanged: (value) {
+            receiptProvider.receipts[widget.currentReceiptID].items[itemIndex].buyer = value;
+          },
+        ),
+      ),
+      // Handles the deletion of an item
+      _deleteSingleItem(context, itemIndex),
     ];
   }
 
-  Widget _deleteSingleItem(BuildContext context, int index) {
-    final provider = context.read<RecieptProvider>();
+  Widget _deleteSingleItem(BuildContext context, int itemIndex) {
+    final receiptProvider = context.read<ReceiptProvider>().receipts[widget.currentReceiptID];
     return GestureDetector(
       onTap: () {
         setState(() {
-          provider.deleteItem(widget.currentReceiptID, index);
+          receiptProvider.items.removeAt(itemIndex);
+          itemNameTextController.removeAt(itemIndex);
+          itemCostTextController.removeAt(itemIndex);
+          buyerTextController.removeAt(itemIndex);
         });
       },
       child: const Icon(
@@ -119,11 +209,19 @@ class _BillPageState extends State<BillPage> {
   }
 
   Widget _addSingleItem(BuildContext context) {
-    final provider = context.read<RecieptProvider>();
+    final receiptProvider = context.read<ReceiptProvider>();
     return GestureDetector(
       onTap: () {
         setState(() {
-          provider.newItem(widget.currentReceiptID);
+          receiptProvider.addItem(widget.currentReceiptID, Item.create());
+
+          itemNameTextController.add(TextEditingController());
+          itemCostTextController.add(TextEditingController());
+          buyerTextController.add(TextEditingController());
+
+          itemNameTextController[itemNameTextController.length - 1].text = '';
+          itemCostTextController[itemCostTextController.length - 1].text = '0.00';
+          buyerTextController[buyerTextController.length - 1].text = '';
         });
       },
       child: const Icon(
