@@ -52,6 +52,7 @@ class _BreakDownPageState extends State<BreakDownPage> {
           count++;
         }
       }
+      print('This profile ${receiptProvider.profiles[profileIndex].name} has $count');
     } else {
       // Loop through Items
       for (int itemIndex = 0; itemIndex < itemLength; itemIndex++) {
@@ -59,7 +60,9 @@ class _BreakDownPageState extends State<BreakDownPage> {
           count++;
         }
       }
+      print('This profile BLANK has $count');
     }
+    print('Return count is $count');
     return count;
   }
 
@@ -100,7 +103,7 @@ class _BreakDownPageState extends State<BreakDownPage> {
         child: Column(
           children: [
             _buildTitle(context),
-            _buildList(context)
+            _buildList(context),
           ],
         ),
       ),
@@ -157,7 +160,7 @@ class _BreakDownPageState extends State<BreakDownPage> {
         return Column(
           children: [
             _buildPersonalBill(context, profileIndex),
-            const Divider(height: 3, thickness: 3, color: Colors.black),
+            if ((profileIndex + 1) < countProfile()) const Divider(height: 3, thickness: 3, color: Colors.black),
           ],
         );
       },
@@ -181,6 +184,8 @@ class _BreakDownPageState extends State<BreakDownPage> {
 
   Widget _buildAllItemList(BuildContext context, int profileIndex) {    // Build the list all the items that belongs to the Profile
     return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: 0),
       shrinkWrap: true,
       itemCount: countItemsPerProfile(profileIndex),
       itemBuilder: (context, itemOfProfileIndex) {
@@ -200,7 +205,6 @@ class _BreakDownPageState extends State<BreakDownPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(receiptProvider.items[itemIndex].name),
-        const Text('........'),
         Text(receiptProvider.items[itemIndex].cost.toStringAsFixed(2)),
       ],
     );
@@ -211,7 +215,6 @@ class _BreakDownPageState extends State<BreakDownPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('SubTotal'),
-        Text('........'),
         Text('Cost'),
       ],
     );
@@ -222,7 +225,6 @@ class _BreakDownPageState extends State<BreakDownPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Tax'),
-        Text('........'),
         Text('Cost'),
       ],
     );
@@ -233,7 +235,6 @@ class _BreakDownPageState extends State<BreakDownPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Tip'),
-        Text('........'),
         Text('Cost'),
       ],
     );
@@ -244,7 +245,6 @@ class _BreakDownPageState extends State<BreakDownPage> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Total'),
-        Text('........'),
         Text('Cost'),
       ],
     );

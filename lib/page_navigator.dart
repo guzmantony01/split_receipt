@@ -20,6 +20,11 @@ class _PageNavigatorState extends State<PageNavigator> {
   int currentReceiptID = 0;
 
   late final List<Widget> pages;
+  List<String> appBarText = [
+      'Name Page',
+      'Bill Page',
+      'BreakDown Page',
+    ];
 
   @override
   void initState() {
@@ -72,7 +77,12 @@ class _PageNavigatorState extends State<PageNavigator> {
           });
         }
       ),
-      body: pages[pageID],
+      body: Scaffold(
+        appBar: AppBar(
+          title: Text(appBarText[pageID]),
+        ),
+        body: pages[pageID],
+      ),
     );
   }
 }

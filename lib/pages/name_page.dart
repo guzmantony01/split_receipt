@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:split_receipt/model/classes.dart';
 import 'package:provider/provider.dart';
 import 'package:split_receipt/model/provider.dart';
+import 'package:split_receipt/model/database_helper.dart';
 
 class NamePage extends StatefulWidget {
   const NamePage({required this.currentReceiptID, super.key});
@@ -13,18 +14,20 @@ class NamePage extends StatefulWidget {
     return _NamePageState();
   }
 }
-
-
 class _NamePageState extends State<NamePage> {
   List<TextEditingController> nameTextController = [];
+
+  void updateFile() async {
+    final receiptProvider = context.read<ReceiptProvider>();
+    await DatabaseHelper.updateReceipt(receiptProvider.receipts[widget.currentReceiptID]);
+    print('Updating receipt ID: ${widget.currentReceiptID}');
+  }
 
   @override
   void initState() {
     super.initState();
     final receiptProvider = context.read<ReceiptProvider>();
-
     int nameLength = receiptProvider.receipts[widget.currentReceiptID].profiles.length;
-
     if (nameLength > 0) {
       for (int i = 0; i < nameLength; i++) {
         nameTextController.add(TextEditingController());
@@ -134,6 +137,7 @@ class _NamePageState extends State<NamePage> {
           controller: nameTextController[nameIndex],
           onChanged: (value) {
             receiptProvider.receipts[widget.currentReceiptID].profiles[nameIndex].name = value;
+            updateFile();
           },
         ),
       ),
@@ -148,6 +152,7 @@ class _NamePageState extends State<NamePage> {
         setState(() {
           receiptProvider.profiles.removeAt(nameIndex);
           nameTextController.removeAt(nameIndex);
+          updateFile();
         });
       },
       child: const Icon(
@@ -163,10 +168,9 @@ class _NamePageState extends State<NamePage> {
       onTap: () {
         setState(() {
           receiptProvider.addProfile(widget.currentReceiptID, Profile.create());
-
           nameTextController.add(TextEditingController());
-
           nameTextController[nameTextController.length - 1].text = '';
+          updateFile();
         });
       },
       child: const Icon(

@@ -5,6 +5,8 @@ import 'package:split_receipt/model/classes.dart';
 import 'package:split_receipt/model/provider.dart';
 import 'package:split_receipt/page_navigator.dart';
 
+import 'package:split_receipt/model/database_helper.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -15,6 +17,39 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  Future<void> _getAllReceipts() async {
+    final receiptProvider = context.read<ReceiptProvider>();
+
+    List<Receipt>? retrievedReceipt = await DatabaseHelper.getAllReceipts();
+    if (retrievedReceipt != null) {
+      int receiptLength = retrievedReceipt.length;
+      print('Retrieved Receipt Length is: $receiptLength');
+      for (int receiptIndex = 0; receiptIndex < receiptLength; receiptIndex++) {
+        receiptProvider.addReceipt(retrievedReceipt[receiptIndex]);
+      }
+    } else {
+      print('No receipt found with the given ID.');
+    }
+    setState(() {});
+  }
+
+  void createFile(int receiptIndex) async {
+    final receiptProvider = context.read<ReceiptProvider>();
+    int receiptId = await DatabaseHelper.insertReceipt(receiptProvider.receipts[receiptIndex]);
+    print('Inserted receipt with ID: $receiptId');
+  }
+
+  void deleteFile(int receiptIndex) async {
+    await DatabaseHelper.deleteReceipt(receiptIndex);
+    print('Deleted receipt with ID: $receiptIndex');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _getAllReceipts();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -122,6 +157,7 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           receiptProvider.receipts.removeAt(index);
           receiptProvider.cleanUpReceipts();
+          deleteFile(index);
         });
       },
       child: const Icon(
@@ -137,7 +173,8 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          receiptProvider.addReceipt(Receipt.create(id: newReceiptIndex, name: '', profiles: [], items: []));
+          receiptProvider.addReceipt(Receipt.create(id: newReceiptIndex, name: '', profiles: [], items: [], fees: Fees(tax: 0.00, tip: 0.00)));
+          createFile(newReceiptIndex);
         });
       },
       child: const Icon(

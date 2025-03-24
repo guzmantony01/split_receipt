@@ -50,7 +50,8 @@ class _BillPageState extends State<BillPage> {
         child: Column(
           children: [
             _buildTitle(context),
-            _buildList(context)
+            _buildList(context),
+            _buildFees(context)
           ],
         ),
       ),
@@ -228,6 +229,53 @@ class _BillPageState extends State<BillPage> {
         Icons.plus_one,
         size: 30,
       )
+    );
+  }
+
+  Widget _buildFees(BuildContext context) {
+    return const SizedBox(
+      child: Card(
+        color: Colors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+          side: BorderSide(
+            width: 2.0,
+            color: Colors.black,
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Tax'),
+                  Text('Cost'),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Tip'),
+                  Text('Cost'),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text('Total'),
+                  Text('Cost'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
